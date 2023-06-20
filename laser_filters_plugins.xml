@@ -60,6 +60,12 @@
 	 This is a filter that removes points on directions defined in a mask from a laser scan.
       </description>
     </class>
+    <class name="laser_filters/LaserScanAngleAndMinRangeFilter" type="laser_filters::LaserScanAngleAndMinRangeFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
+      <description>
+	 This is a filter that removes points on directions defined in a mask from a laser scan.
+      </description>
+    </class>
     <class name="laser_filters/LaserMedianFilter" type="laser_filters::LaserMedianFilter" 
 	    base_class_type="filters::FilterBase<sensor_msgs::msg::LaserScan>">
       <description>
