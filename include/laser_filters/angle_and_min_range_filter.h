@@ -40,6 +40,7 @@
     Basically and:ing a range and angle filter
 **/
 
+#include <math.h>
 #include "filters/filter_base.hpp"
 #include <sensor_msgs/msg/laser_scan.hpp>
 
@@ -60,8 +61,8 @@ public:
   bool configure()
   {
     range_threshold_ = 0.0;
-    lower_angle_threshold_ = 0.0;
-    upper_angle_threshold_ = 2 * 3.14159265; // TODO(Chris): Swap for math.PI
+    lower_angle_threshold_ = -M_PI;
+    upper_angle_threshold_ = M_PI;
     getParam("range_threshold", range_threshold_);
     getParam("lower_angle_threshold", lower_angle_threshold_);
     getParam("upper_angle_threshold", upper_angle_threshold_);
@@ -85,25 +86,23 @@ public:
   bool update(const sensor_msgs::msg::LaserScan& input_scan, sensor_msgs::msg::LaserScan& filtered_scan)
   {
     unsigned int count = 0;
+    float current_angle = lower_angle_threshold_;
+    unsigned int start_index = (lower_angle_threshold_ - input_scan.angle_min) / input_scan.angle_increment;
+    unsigned int end_index = (upper_angle_threshold_ - input_scan.angle_min) / input_scan.angle_increment;
+
     filtered_scan = input_scan;
-    float current_angle = input_scan.angle_min;
 
     if (use_message_range_limits_)
     {
-      range_threshold_ = 0.99 * input_scan.range_min;
+      range_threshold_ = input_scan.range_min;
     }
     
-    for (unsigned int i=0; i < input_scan.ranges.size(); i++) // Need to check ever reading in the current scan
+    // loop over all values in the angle span
+    for (unsigned int i=start_index; i < end_index; i++)
     {
-      if (current_angle < lower_angle_threshold_){
-        // empty
-      }else if(current_angle < upper_angle_threshold_ ){ // this is the angle range to filter
-        if(filtered_scan.ranges[i] < range_threshold_){
-          filtered_scan.ranges[i] = replacement_value_;
-          count++;
-        }
-      }else if (current_angle > upper_angle_threshold_){
-        break; // done with filter range, no need to keep looping
+      if(filtered_scan.ranges[i] < range_threshold_){
+        filtered_scan.ranges[i] = replacement_value_;
+        count++;
       }
       current_angle += input_scan.angle_increment;
     }
