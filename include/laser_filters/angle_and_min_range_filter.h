@@ -120,7 +120,6 @@ public:
     filtered_scan.range_max = input_scan.range_max;
 
     RCLCPP_DEBUG(logging_interface_->get_logger(), "Filtered out %d points from the laser scan.", (int)count);
-    RCLCPP_INFO(logging_interface_->get_logger(), "Filtered out %d points from the laser scan.", (int)count);
 
     return true;
   }
